@@ -1,0 +1,10 @@
+{
+  "name": "k8s-collector",
+  "version": "1.0.0",
+  "description": "Kubernetes data collector module using kubectl CLI",
+  "main": "pods.js",
+  "private": true,
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 0"
+  }
+}
