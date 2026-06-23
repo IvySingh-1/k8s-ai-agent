@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: buggy-app
+  labels:
+    app: buggy-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: buggy-app
+  template:
+    metadata:
+      labels:
+        app: buggy-app
+    spec:
+      containers:
+      - name: app-container
+        image: alpine
+        command: ["sh", "-c", "echo 'Booting Application Server v1.0.0...'; sleep 2; echo 'Initializing heap cache...'; x='a'; while true; do x=\"$x$x\"; done"]
+        resources:
+          limits:
+            memory: "15Mi"
+          requests:
+            memory: "10Mi"

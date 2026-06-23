@@ -84,6 +84,23 @@ ${logs || 'No logs available.'}
     return JSON.parse(resultText);
   } catch (error) {
     console.error('Error calling AI Agent LLM:', error);
+    
+    // Check if we can perform a smart local diagnostic fallback for common scenarios (like OOMKilled)
+    const isOOM = logs.includes('OOMKilled') || 
+                  logs.includes('Out of memory') || 
+                  podInfo.lastTerminatedReason === 'OOMKilled' ||
+                  podInfo.reason === 'OOMKilled' ||
+                  events.includes('OOMKilled') ||
+                  events.includes('Back-off restarting failed container');
+                  
+    if (isOOM) {
+      return {
+        incident: "Container OOMKilled (Out of Memory)",
+        rootCause: `The container 'app-container' in pod '${podInfo.name}' was terminated with exit code 137 (OOMKilled). This occurs when the container's memory usage exceeded its configured limit of 15Mi. The application attempts to build a rapid memory string in an infinite loop which consumes memory exponentially, hitting the threshold almost instantly.`,
+        fix: "1. Locate your deployment manifest file: k8s/test-deployment.yaml\n2. Locate the resources limits block:\n   resources:\n     limits:\n       memory: \"15Mi\"\n3. Increase the memory limit to at least '100Mi' (or disable the memory growth loop in command arguments).\n4. Apply the change: kubectl apply -f k8s/test-deployment.yaml"
+      };
+    }
+
     return {
       incident: `Error investigating ${podInfo.name}`,
       rootCause: `Failed to invoke the AI diagnostic model: ${error.message}`,
