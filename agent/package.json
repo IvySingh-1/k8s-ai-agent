@@ -1,0 +1,11 @@
+{
+  "name": "k8s-ai-agent",
+  "version": "1.0.0",
+  "description": "AI agent that analyzes Kubernetes failures and generates root cause analysis",
+  "main": "index.js",
+  "private": true,
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "openai": "^4.52.0"
+  }
+}
