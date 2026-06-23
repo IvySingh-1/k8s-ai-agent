@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-error-app
+  labels:
+    app: app-error-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: app-error-app
+  template:
+    metadata:
+      labels:
+        app: app-error-app
+    spec:
+      containers:
+      - name: app-container
+        image: alpine
+        command: ["sh", "-c", "echo 'Booting Application Server v1.0.0...'; sleep 1; echo '[FATAL] Database connection failed: DB_PASSWORD environment variable is not defined.'; exit 1"]

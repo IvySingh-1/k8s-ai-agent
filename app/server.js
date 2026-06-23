@@ -74,8 +74,15 @@ app.get('/api/investigate/:podName', async (req, res) => {
       return res.status(404).json({ error: `Pod '${podName}' not found in namespace '${namespace}'` });
     }
 
-    // 2. Fetch logs (will auto fallback to previous container runs if crashed)
-    const logs = await getLogs(podName, namespace);
+    // 2. Fetch logs (bypass kubectl logs if the container has never run or is pending)
+    let logs = '';
+    if (podInfo.status === 'Pending') {
+      logs = `[INFO] No logs are available because the pod is in Pending status and has not been scheduled or initialized yet.`;
+    } else if (podInfo.reason === 'ImagePullBackOff' || podInfo.reason === 'ErrImagePull') {
+      logs = `[INFO] No logs are available because the container image could not be pulled from the registry. The container has never started.`;
+    } else {
+      logs = await getLogs(podName, namespace);
+    }
 
     // 3. Fetch cluster events
     const events = await getEvents(namespace);

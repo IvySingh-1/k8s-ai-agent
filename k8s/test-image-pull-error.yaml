@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: image-pull-error-app
+  labels:
+    app: image-pull-error-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: image-pull-error-app
+  template:
+    metadata:
+      labels:
+        app: image-pull-error-app
+    spec:
+      containers:
+      - name: app-container
+        # Using a nonexistent tag to trigger ImagePullBackOff / ErrImagePull
+        image: alpine:nonexistent-tag-999
+        command: ["sh", "-c", "echo 'Running...'; sleep 3600"]

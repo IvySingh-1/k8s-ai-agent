@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: probe-failure-app
+  labels:
+    app: probe-failure-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: probe-failure-app
+  template:
+    metadata:
+      labels:
+        app: probe-failure-app
+    spec:
+      containers:
+      - name: app-container
+        image: nginx:alpine
+        ports:
+        - containerPort: 80
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 80
+          initialDelaySeconds: 2
+          periodSeconds: 3
